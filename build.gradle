@@ -1,0 +1,24 @@
+
+apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: 'maven'
+
+sourceCompatibility = 1.8
+
+jar {
+    version = '0.0.1-SNAPSHOT'
+    baseName = 'nam-smstoken'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile('org.projectlombok:lombok:1.16.18')
+    compile('org.slf4j:slf4j-api:1.7.25')
+    compile('org.apache.tomcat:tomcat-servlet-api:9.0.0.M26')
+
+
+    compile files('netiq/nidp.jar', 'netiq/NAMCommon.jar')
+}
