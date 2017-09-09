@@ -10,12 +10,14 @@ class SMSTokenSpec extends Specification {
     private SMSGateway smsGateway
 
     void setup() {
+        /*
         def servletContext = Mock(NIDPServletContext) {
             getLoggableDeviceId() >> '123'
         }
         Mock(NIDPContext) {
             getNIDPContext() >> servletContext
         }
+        */
         smsGateway = Mock(SMSGateway)
         smsToken = new SMSToken(smsGateway)
     }
@@ -25,6 +27,6 @@ class SMSTokenSpec extends Specification {
         def authenticate = smsToken.doAuthenticate()
 
         then:
-        authenticate == 2
+        authenticate == SMSToken.NOT_AUTHENTICATED
     }
 }
