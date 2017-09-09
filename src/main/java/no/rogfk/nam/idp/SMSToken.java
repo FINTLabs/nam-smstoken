@@ -7,14 +7,15 @@ import com.novell.nidp.authentication.AuthnConstants;
 import com.novell.nidp.authentication.local.LocalAuthenticationClass;
 import com.novell.nidp.common.authority.UserAuthority;
 import lombok.extern.slf4j.Slf4j;
+import no.rogfk.nam.idp.exceptions.MissingMobileNumberException;
+import no.rogfk.nam.idp.exceptions.MobileNumberException;
+import no.rogfk.nam.idp.smsgateway.Config;
+import no.rogfk.nam.idp.smsgateway.SMSGateway;
+import no.rogfk.nam.idp.smsgateway.exceptions.SMSGatewayException;
+import no.rogfk.nam.idp.utils.Mobile;
+import no.rogfk.nam.idp.utils.Token;
+import no.rogfk.nam.idp.utils.Tracer;
 
-import javax.naming.directory.Attribute;
-import javax.naming.directory.Attributes;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Properties;
@@ -23,30 +24,48 @@ import java.util.Properties;
 @Slf4j
 public class SMSToken extends LocalAuthenticationClass {
 
-    private String sessionUser;
+    private boolean allowSessionUser;
     private String smsToken;
     private boolean smsTokenSent;
 
-    String phoneAttr = getProperty("phoneAttr");  // the attribute name to retrieve the number - default mobile
-    String charsToken = getProperty("charsToken");  // characters allowed in token - default ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890
-    String lengthToken = getProperty("lengthToken");  // length token - default 6
-    String gwURL = getProperty("gwURL"); // gateway URL - mandatory
-    String gwUserParameter = getProperty("gwUserParameter"); // username to auth to gw
-    String gwPasswdParameter = getProperty("gwPasswdParameter");  // password to auth to gw
-    String gwExtraParameter = getProperty("gwExtraParameter"); // extra param for gw
-    String gwExtraParameter2 = getProperty("gwExtraParameter2"); // extra param2 for gw
-    String gwDestName = getProperty("gwDestName"); // name of the Destination parameter for gw
-    String gwMessageName = getProperty("gwMessageName"); // name of the message parameter for gw
-    String gwSuccess = getProperty("gwSuccess"); // success if gw response contains this value
-    String gwError = getProperty("gwError"); // error if gw response contains this value
-    String debug = getProperty("debug"); // if this is present, debug is enabled
+    private String phoneAttribute;
+    private String charsToken;
+    private String lengthToken;
+    private String missingMobileMessage;
+    private Tracer tracer;
+    private SMSGateway smsGateway;
 
 
     public SMSToken(Properties properties, ArrayList<UserAuthority> arrayList) {
         super(properties, arrayList);
-        sessionUser = "true";
         smsTokenSent = false;
 
+        allowSessionUser = Boolean.valueOf(getProperty("allowSessionUser"));
+        phoneAttribute = getProperty("phoneAttribute");  // the attribute name to retrieve the number - default mobile
+        charsToken = getProperty("charsToken");  // characters allowed in token - default ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890
+        lengthToken = getProperty("lengthToken");  // length token - default 6
+        missingMobileMessage = getProperty("missingMobileMessage");
+
+        tracer = new Tracer(Boolean.valueOf(getProperty("trace")));
+
+        Config smsConfig = new Config();
+        smsConfig.setGatewayDestName(getProperty("gatewayDestName"));
+        smsConfig.setGatewayError(getProperty("gatewayError"));
+        smsConfig.setGatewaySuccess(getProperty("gatewaySuccess"));
+        smsConfig.setGatewayMessageName(getProperty("gatewayMessageName"));
+        smsConfig.setGatewayURL(getProperty("gatewayURL"));
+        smsConfig.setGatewayPasswordParameter(getProperty("gatewayPasswordParameter"));
+        smsConfig.setGatewayUserParameter(getProperty("gatewayUserParameter"));
+        smsConfig.setGatewayExtraParameter1(getProperty("gatewayExtraParameter1"));
+        smsConfig.setGatewayExtraParameter2(getProperty("gatewayExtraParameter2"));
+
+        smsGateway = new SMSGateway(smsConfig, tracer);
+    }
+
+    SMSToken(SMSGateway smsGateway) {
+        super(new Properties(), new ArrayList<>());
+        tracer = new Tracer(true);
+        this.smsGateway = smsGateway;
     }
 
 
@@ -58,160 +77,124 @@ public class SMSToken extends LocalAuthenticationClass {
     public int doAuthenticate() {
         log.info("SMSToken: doAuthenticate()");
 
-        NIDPPrincipal nIDPPrincipal = getUserPrincipal();
-
-        if (nIDPPrincipal == null) {
-            setUserErrorMsg("No Authenticated User Found");
-            log.info("No Authenticated User Found");
-            NIDPError nIDPError = new NIDPError(getUserErrorMsg(), getUserErrorMsg(), Locale.US);
-            showError(nIDPError);
+        if (!validAuthentication()) {
             return NOT_AUTHENTICATED;
         }
 
-        log.info("Found principal {}", nIDPPrincipal.getUserIdentifier());
-
-        setPrincipal(nIDPPrincipal);
 
         if (!smsTokenSent) {
-            log.info("Sending SMS Token");
+            tracer.trace("Sending SMS Token");
+
+            smsToken = Token.getToken(charsToken, lengthToken);
+            tracer.trace("Token: ", smsToken);
+
+            try {
+                log.info("Showing SMS Token input page");
+                String[] mobilePhoneAttribute = Mobile.validateMobileNumberAttribute(phoneAttribute);
 
 
-            log.info("Mobile: {}", getMobileNumber());
-            log.info("Token: {}", generateToken());
+                String mobile = Mobile.getMobile(getPrincipalAttributes(mobilePhoneAttribute));
+                tracer.trace("Mobile:", mobile);
 
-            smsToken = generateToken();
+                smsGateway.sendSMS(mobile, smsToken);
 
-            log.info("Showing SMS Token input page");
-            sendSMS(getMobileNumber());
-            smsTokenSent = true;
-            m_Request.setAttribute(NIDPConstants.ATTR_URL, (getReturnURL() != null ? getReturnURL() : m_Request.getRequestURL().toString()));
-            showJSP("token");
-            return SHOW_JSP;
+                return showInitialTokenJSP();
+
+            } catch (MissingMobileNumberException e) {
+                tracer.trace(e.getMessage());
+                return showLoginError(String.format("%s. %s.", e.getMessage(), missingMobileMessage));
+            } catch (MobileNumberException | SMSGatewayException e) {
+                tracer.trace(e.getMessage());
+                return showLoginError(e.getMessage());
+            }
         }
 
 
         if (smsTokenSent) {
             log.info("Validating SMS Token");
-            String vToken = m_Request.getParameter("Response");
-            if (vToken == null || vToken.length() == 0) {
-                NIDPError nIDPError = new NIDPError(getUserErrorMsg(), getUserErrorMsg(), Locale.US);
-                showError(nIDPError);
-                return NOT_AUTHENTICATED;
-            }
-            if (vToken.equals(smsToken)) {
+            String token = m_Request.getParameter("Response");
+
+            if (Token.validateToken(token, smsToken)) {
                 log.info("SMSToken Authentication Success");
                 return AUTHENTICATED;
+            } else {
+                return showLoginError("Validating SMS Token failed");
             }
-            m_Request.setAttribute(NIDPConstants.ATTR_LOGIN_ERROR, "SMS Login Failed");
-            log.info("Token validation failed");
-            return NOT_AUTHENTICATED;
         }
 
         return NOT_AUTHENTICATED;
     }
 
+    private boolean validAuthentication() {
+
+        NIDPPrincipal nidpPrincipal = getUserPrincipal();
+
+        if (nidpPrincipal == null) {
+            setUserErrorMsg("No Authenticated User Found");
+            tracer.trace("No Authenticated User Found");
+            try {
+                NIDPError nIDPError = new NIDPError(getUserErrorMsg(), getUserErrorMsg(), Locale.US);
+                showError(nIDPError);
+            } catch(NullPointerException ignore) { // added to be able to run unit test
+            }
+
+            return false;
+        }
+
+        setPrincipal(nidpPrincipal);
+
+        return true;
+    }
+
+    private int showInitialTokenJSP() {
+        smsTokenSent = true;
+        m_Request.setAttribute(NIDPConstants.ATTR_URL, (getReturnURL() != null ? getReturnURL() : m_Request.getRequestURL().toString()));
+        showJSP("token");
+        return SHOW_JSP;
+    }
+
     private NIDPPrincipal getUserPrincipal() {
-        NIDPPrincipal nIDPPrincipal = (NIDPPrincipal) m_Properties.get("Principal");
+        NIDPPrincipal idpPrincipal = getContractUser();
 
-        if (nIDPPrincipal == null) {
+        if (idpPrincipal == null) {
+            idpPrincipal = getSessionUser();
+        }
 
-            if (sessionUser != null) {
-                if (m_Session.isAuthenticated()) {
-                    NIDPPrincipal[] arrnIDPPrincipal = m_Session.getSubject().getPrincipals();
-                    if (arrnIDPPrincipal.length == 1) {
-                        nIDPPrincipal = arrnIDPPrincipal[0];
-                        log.info("Found Session Authenticated User: {}", nIDPPrincipal.getUserIdentifier());
-                    }
-                }
-                if (nIDPPrincipal == null) {
-                    log.info("No Session Authenticated User Found");
-                }
+        return idpPrincipal;
+    }
+
+    private NIDPPrincipal getContractUser() {
+        NIDPPrincipal contractUser = (NIDPPrincipal) m_Properties.get("Principal");
+
+        if (contractUser != null) {
+            tracer.trace("Found contract authenticated user: ", contractUser.getUserIdentifier());
+        }
+
+        return contractUser;
+    }
+
+    private NIDPPrincipal getSessionUser() {
+
+        if (allowSessionUser && m_Session.isAuthenticated()) {
+            NIDPPrincipal[] idpPrincipalList = m_Session.getSubject().getPrincipals();
+            if (idpPrincipalList.length == 1) {
+                NIDPPrincipal sessionPricipal = idpPrincipalList[0];
+                tracer.trace("Found session authenticated user: ", sessionPricipal.getUserIdentifier());
+                return sessionPricipal;
             }
-        } else {
-            log.info("Found Contract Authenticated User: {}" + nIDPPrincipal.getUserIdentifier());
         }
-        return nIDPPrincipal;
+
+        return null;
     }
 
-    private String generateToken() {
-        if (charsToken == null || charsToken.length() == 0)
-            charsToken = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-        if (lengthToken == null || lengthToken.length() == 0)
-            lengthToken = "6";
-        int lengthInt = Integer.valueOf(lengthToken).intValue() + 1;
-        int i;
-        String token = "";
-        for (i = 1; i < lengthInt; i++) {
-            int index = (int) (charsToken.length() * Math.random());
-            token = token + charsToken.charAt(index);
-        }
-        return token;
+    private int showLoginError(String message) {
+        m_Request.setAttribute(NIDPConstants.ATTR_URL, (getReturnURL() != null ? getReturnURL() : m_Request.getRequestURL().toString()));
+        m_Request.setAttribute(NIDPConstants.ATTR_LOGIN_ERROR, message);
+        showJSP("token");
+        tracer.trace(message);
+        return SHOW_JSP;
+
     }
 
-    private String getMobileNumber() {
-        if (phoneAttr == null || phoneAttr.length() == 0)
-            phoneAttr = "mobile";
 
-        String[] qAttr = {phoneAttr};
-        String number = null;
-        Attributes vAttr = getPrincipalAttributes(qAttr);
-        int vCount = vAttr.size();
-        if (vCount != 1) {
-            setErrorMsg(NIDPConstants.ATTR_LOGIN_ERROR, "Phone number error");
-            log.info("Phone number error");
-        }
-        if (vCount == 1) {
-            Attribute vAttr2 = vAttr.get(phoneAttr);
-            String vAttr3 = vAttr2.toString();
-            int subCount = phoneAttr.length() + 2;
-            number = vAttr3.substring(subCount);
-        }
-        return number;
-    }
-
-    private int sendSMS(String phoneNumber) {
-        int result = 0;
-        if (gwSuccess != null)
-            result = 2;
-        int resultSuccess = 0;
-        int resultError = 0;
-        try {
-            String data = gwUserParameter + "&" + gwPasswdParameter + "&" + gwDestName + "=" + phoneNumber + "&" + gwMessageName + "=" + smsToken + "&" + gwExtraParameter + "&" + gwExtraParameter2;
-            log.info("SMS gateway request: {}?{} ", gwURL, data);
-            URL url = new URL(gwURL);
-            URLConnection urlconn = url.openConnection();
-            urlconn.setDoOutput(true);
-            OutputStreamWriter swr = new OutputStreamWriter(urlconn.getOutputStream());
-            swr.write(data);
-            swr.flush();
-            BufferedReader brd = new BufferedReader(new InputStreamReader(urlconn.getInputStream()));
-            String line;
-            while ((line = brd.readLine()) != null) {
-                log.info("SMS gateway output: {}", line);
-                if (gwError != null && line.indexOf(gwError) >= 0)
-                    resultError = 1;
-
-                if (gwSuccess != null && line.indexOf(gwSuccess) >= 0)
-                    resultSuccess = 1;
-            }
-            swr.close();
-            brd.close();
-        } catch (Exception e) {
-            log.info("SMS gateway exception: {}", e);
-            result = 3;
-        }
-
-        if (resultError == 1)
-            result = 1;
-        if (resultSuccess == 1)
-            result = 0;
-
-        if (result == 1)
-            m_Request.setAttribute(NIDPConstants.ATTR_LOGIN_ERROR, "SMS Gateway Error (Error Found)");
-        if (result == 2)
-            m_Request.setAttribute(NIDPConstants.ATTR_LOGIN_ERROR, "SMS Gateway Error (Success Not Found)");
-        if (result == 3)
-            m_Request.setAttribute(NIDPConstants.ATTR_LOGIN_ERROR, "Method Configuration Error");
-        return result;
-    }
 }

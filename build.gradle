@@ -12,13 +12,25 @@ jar {
 
 repositories {
     mavenCentral()
+    flatDir {
+        dirs 'netiq'
+    }
 }
 
+apply from: 'https://raw.githubusercontent.com/FINTlibs/fint-buildscripts/v1.0.14/dependencies.gradle'
 dependencies {
     compile('org.projectlombok:lombok:1.16.18')
     compile('org.slf4j:slf4j-api:1.7.25')
     compile('org.apache.tomcat:tomcat-servlet-api:9.0.0.M26')
 
+    //compile name: 'nidp'
+    //compile name: 'NAMCommon'
 
-    compile files('netiq/nidp.jar', 'netiq/NAMCommon.jar')
+    compile fileTree(dir: 'netiq', include: '*.jar')
+
+    testCompile('org.apache.commons:commons-lang3:3.6')
+    testCompile('cglib:cglib-nodep:3.2.5')
+    testCompile("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
+    testCompile("org.spockframework:spock-spring:${spockSpringVersion}")
+    testCompile("org.spockframework:spock-core:${spockSpringVersion}")
 }
