@@ -1,7 +1,5 @@
 package no.rogfk.nam.idp
 
-import com.novell.nidp.NIDPContext
-import com.novell.nidp.servlets.NIDPServletContext
 import no.rogfk.nam.idp.smsgateway.SMSGateway
 import spock.lang.Specification
 
@@ -10,14 +8,7 @@ class SMSTokenSpec extends Specification {
     private SMSGateway smsGateway
 
     void setup() {
-        /*
-        def servletContext = Mock(NIDPServletContext) {
-            getLoggableDeviceId() >> '123'
-        }
-        Mock(NIDPContext) {
-            getNIDPContext() >> servletContext
-        }
-        */
+
         smsGateway = Mock(SMSGateway)
         smsToken = new SMSToken(smsGateway)
     }
@@ -28,5 +19,19 @@ class SMSTokenSpec extends Specification {
 
         then:
         authenticate == SMSToken.NOT_AUTHENTICATED
+    }
+
+    def "Name"() {
+        given:
+
+
+        when:
+        def authenticate = smsToken.doAuthenticate()
+
+        then:
+        1 * smsToken.validAuthentication() >> true
+        authenticate == SMSToken.SHOW_JSP
+
+
     }
 }

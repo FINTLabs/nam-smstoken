@@ -13,7 +13,7 @@ class MobileSpec extends Specification {
         def mobileAttribute = Mobile.validateMobileNumberAttribute("")
 
         then:
-        mobileAttribute == SMSTokenConstants.DEFALT_MOBILE_ATTRIBUTE
+        mobileAttribute[0] == SMSTokenConstants.DEFALT_MOBILE_ATTRIBUTE
     }
 
     def "Return configured mobile attribute"() {
@@ -22,6 +22,6 @@ class MobileSpec extends Specification {
         def mobileAttribute = Mobile.validateMobileNumberAttribute("mobileNumber")
 
         then:
-        mobileAttribute == "mobileNumber"
+        mobileAttribute[0] == "mobileNumber"
     }
 }

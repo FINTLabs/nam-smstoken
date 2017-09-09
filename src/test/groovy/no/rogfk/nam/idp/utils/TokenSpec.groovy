@@ -13,7 +13,7 @@ class TokenSpec extends Specification {
         def token = Token.getToken(chars, len)
 
         then:
-        token.length() == len
+        token.length() == Integer.valueOf(len)
         StringUtils.containsOnly(token, chars)
     }
 
