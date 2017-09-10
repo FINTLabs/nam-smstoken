@@ -23,11 +23,16 @@ dependencies {
     compile('org.slf4j:slf4j-api:1.7.25')
     compile('org.apache.tomcat:tomcat-servlet-api:9.0.0.M26')
 
-    //compile name: 'nidp'
-    //compile name: 'NAMCommon'
+    compile name: 'nidp'
+    compile name: 'NAMCommon'
 
-    compile fileTree(dir: 'netiq', include: '*.jar')
+    //compile fileTree(dir: 'netiq', include: '*.jar')
 
+
+    testCompile name: 'jcc'
+    testCompile name: 'jgroups-all'
+    testCompile name: 'jsso'
+    testCompile name: 'nxpe'
     testCompile('org.apache.commons:commons-lang3:3.6')
     testCompile('cglib:cglib-nodep:3.2.5')
     testCompile("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")

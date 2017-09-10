@@ -1,28 +1,47 @@
 # nam-smstoken
-SMS token authentication class for NetIQ Access Manager Edit
+SMS token authentication class for NetIQ Access Manager
 
 
+# Install
+
+* Download the `jar` (`nam-smstoken-x.x.x.jar`) from [lastest](https://github.com/Rogaland/nam-smstoken/releases/latest) and copy it to 
+`/opt/novell/nam/idp/webapps/nidp/WEB-INF/lib`. See [Prerequisites](https://www.netiq.com/documentation/access-manager-43/nacm_enu/data/b8q8uws.html)
+in the NetIQ documentation for more information.
+
+* Create a `token.jsp file. See the example in the `pages` directory of this project.
 
 
-# Configuration
-| Parameter                | Default value                          | Description                                                                            | Example                                                                                                              |
-|--------------------------|----------------------------------------|----------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
-| allowSessionUser         | `false`                                | Indicates if we should look for session user                                           | `true` \ `false`                                                                                                     |
-| phoneAttribute           | `mobile`                               | The name of the mobile LDAP attribute                                                  | `mobileNumber`                                                                                                       |
-| charsToken               | `1234567890` | Characters to be used when generating `token`                                          | `1234567890`                                                                                                         |
-| lengthToken              | `4`                                    | Lenght of the `token`                                                                  | `4`                                                                                                                  |
-| missingMobileMessage     |                                        | The message to be shown if no mobile number is found for the user                      | `Unable to find a mobile number for your user. Goto <a href="https://me.site.com/mobile">Update you mobilenumber</a>` |
-| gatewayDestName          |                                        | Name of the URL parameter for the destination mobilenumber                             | `sMobile`                                                                                                            |
-| gatewayError             |                                        | String to look for in the gateway response if the gateway wasn't able to send the SMS  | `false`                                                                                                              |
-| gatewaySuccess           |                                        | String to look for in the gateway respone if the gateway successfully sent the SMS     | `true`                                                                                                               |
-| gatewayMessageName       |                                        | Name of the URL parameter for the message                                              | `sMessage`                                                                                                           |
-| gatewayURL               |                                        | Endpoint to the SMS gateway                                                            | `https://gateway.sms.org/SendSMS`                                                                                    |
-| gatewayPasswordParameter |                                        | The URL parameter for the gateway password                                             | `sPassword=topsecret`                                                                                                |
-| gatewayUserParameter     |                                        | The URL parameter for the gateway username                                             | `sUser=smsuser`                                                                                                      |
-| gatewayExtraParameter1   |                                        | The URL parameter for extra parameter                                                  | `extraParam=value`                                                                                                   |
-| gatewayExtraParameter2   |                                        | The URL parameter for extra parameter                                                  | `extraParam=value`                                                                                                   |
+## Configuration
 
+| Parameter                | Required | Default value                          | Description                                                                            | Example                                                                                                              |
+|--------------------------|----------|----------------------------------------|----------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
+| allowSessionUser         |  `false` |   `false`                                | Indicates if we should look for session user                                           | `true` \ `false`                                                                                                     |
+| phoneAttribute           | `false`  | `mobile`                               | The name of the mobile LDAP attribute                                                  | `mobileNumber`                                                                                                       |
+| charsToken               | `false`  |`1234567890` | Characters to be used when generating `token`                                          | `1234567890`                                                                                                         |
+| lengthToken              | `false`  |`4`                                    | Lenght of the `token`                                                                  | `4`                                                                                                                  |
+| missingMobileMessage     | `true`   |                                    | The message to be shown if no mobile number is found for the user                      | `Unable to find a mobile number for your user. Goto <a href="https://me.site.com/mobile">Update you mobilenumber</a>` |
+| gatewayDestName          | `true`   |                                       | Name of the URL parameter for the destination mobilenumber                             | `sMobile`                                                                                                            |
+| gatewayError             | `true`   |                                       | String to look for in the gateway response if the gateway wasn't able to send the SMS  | `false`                                                                                                              |
+| gatewaySuccess           | `true`   |                                       | String to look for in the gateway respone if the gateway successfully sent the SMS     | `true`                                                                                                               |
+| gatewayMessageName       | `true`   |                                       | Name of the URL parameter for the message                                              | `sMessage`                                                                                                           |
+| gatewayURL               | `true`   |                                       | Endpoint to the SMS gateway                                                            | `https://gateway.sms.org/SendSMS`                                                                                    |
+| gatewayPasswordParameter | `true`   |                                       | The URL parameter for the gateway password                                             | `sPassword=topsecret`                                                                                                |
+| gatewayUserParameter     | `true`   |                                       | The URL parameter for the gateway username                                             | `sUser=smsuser`                                                                                                      |
+| gatewayExtraParameter1   | `false`  |                                       | The URL parameter for extra parameter                                                  | `extraParam=value`                                                                                                   |
+| gatewayExtraParameter2   | `false`  |                                       | The URL parameter for extra parameter                                                  | `extraParam=value`                                                                                                   |
 
+# Build from source
+
+The documentation from [NetIQ](https://www.netiq.com/documentation/access-manager-43/nacm_enu/data/b8q8uws.html) 
+states that you need `NAMCommon.jar` and `nidp.jar` to build the authentication class. This project has extensively
+testing so you will also need to copy these `jar`s from `/opt/novell/nam/idp/webapps/nidp/WEB-INF/lib` into the `netiq`
+folder of the project to be able to build:
+```
+jcc.jar
+jgroups-all.jar
+jsso.jar
+nxpe.jar
+```
 
 # References
 [Identity Server Authentication API](https://www.netiq.com/documentation/access-manager-43/nacm_enu/data/b8q6tv9.html)
