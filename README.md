@@ -1,12 +1,16 @@
 # nam-smstoken
+SMS token authentication class for NetIQ Access Manager Edit
+
+
+
 
 # Configuration
-| Parametert               | Default value                          | Description                                                                            | Example                                                                                                              |
+| Parameter                | Default value                          | Description                                                                            | Example                                                                                                              |
 |--------------------------|----------------------------------------|----------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
 | allowSessionUser         | `false`                                | Indicates if we should look for session user                                           | `true` \ `false`                                                                                                     |
 | phoneAttribute           | `mobile`                               | The name of the mobile LDAP attribute                                                  | `mobileNumber`                                                                                                       |
-| charsToken               | `ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890` | Characters to be used when generating `token`                                          | `1234567890`                                                                                                         |
-| lengthToken              | `6`                                    | Lenght of the `token`                                                                  | `4`                                                                                                                  |
+| charsToken               | `1234567890` | Characters to be used when generating `token`                                          | `1234567890`                                                                                                         |
+| lengthToken              | `4`                                    | Lenght of the `token`                                                                  | `4`                                                                                                                  |
 | missingMobileMessage     |                                        | The message to be shown if no mobile number is found for the user                      | `Unable to find a mobile number for your user. Goto <a href="https://me.site.com/mobile">Update you mobilenumber</a>` |
 | gatewayDestName          |                                        | Name of the URL parameter for the destination mobilenumber                             | `sMobile`                                                                                                            |
 | gatewayError             |                                        | String to look for in the gateway response if the gateway wasn't able to send the SMS  | `false`                                                                                                              |
@@ -20,5 +24,5 @@
 
 
 
-# Referances
+# References
 [Identity Server Authentication API](https://www.netiq.com/documentation/access-manager-43/nacm_enu/data/b8q6tv9.html)

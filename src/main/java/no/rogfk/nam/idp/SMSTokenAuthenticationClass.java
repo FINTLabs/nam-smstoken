@@ -22,11 +22,12 @@ import java.util.Properties;
 
 
 @Slf4j
-public class SMSToken extends LocalAuthenticationClass {
+public class SMSTokenAuthenticationClass extends LocalAuthenticationClass {
 
     private boolean allowSessionUser;
-    private String smsToken;
-    private boolean smsTokenSent;
+
+    protected boolean smsTokenSent;
+    protected String smsToken;
 
     private String phoneAttribute;
     private String charsToken;
@@ -36,7 +37,7 @@ public class SMSToken extends LocalAuthenticationClass {
     private SMSGateway smsGateway;
 
 
-    public SMSToken(Properties properties, ArrayList<UserAuthority> arrayList) {
+    public SMSTokenAuthenticationClass(Properties properties, ArrayList<UserAuthority> arrayList) {
         super(properties, arrayList);
         smsTokenSent = false;
 
@@ -60,12 +61,17 @@ public class SMSToken extends LocalAuthenticationClass {
         smsConfig.setGatewayExtraParameter2(getProperty("gatewayExtraParameter2"));
 
         smsGateway = new SMSGateway(smsConfig, tracer);
+
+        tracer.trace("Greetings from Rogaland fylkeskommune, IKT- og arkivavdelingen!");
     }
 
-    SMSToken(SMSGateway smsGateway) {
-        super(new Properties(), new ArrayList<>());
+    SMSTokenAuthenticationClass(Properties properties, SMSGateway smsGateway) {
+        super(properties, new ArrayList<>());
         tracer = new Tracer(true);
         this.smsGateway = smsGateway;
+    }
+
+    protected void init() {
     }
 
 
@@ -75,54 +81,57 @@ public class SMSToken extends LocalAuthenticationClass {
 
     @Override
     public int doAuthenticate() {
-        log.info("SMSToken: doAuthenticate()");
+        tracer.trace("SMSTokenAuthenticationClass: doAuthenticate()");
 
-        if (!validAuthentication()) {
-            return NOT_AUTHENTICATED;
-        }
-
-
-        if (!smsTokenSent) {
-            tracer.trace("Sending SMS Token");
-
-            smsToken = Token.getToken(charsToken, lengthToken);
-            tracer.trace("Token: ", smsToken);
-
-            try {
-                log.info("Showing SMS Token input page");
-                String[] mobilePhoneAttribute = Mobile.validateMobileNumberAttribute(phoneAttribute);
-
-
-                String mobile = Mobile.getMobile(getPrincipalAttributes(mobilePhoneAttribute));
-                tracer.trace("Mobile:", mobile);
-
-                smsGateway.sendSMS(mobile, smsToken);
-
-                return showInitialTokenJSP();
-
-            } catch (MissingMobileNumberException e) {
-                tracer.trace(e.getMessage());
-                return showLoginError(String.format("%s. %s.", e.getMessage(), missingMobileMessage));
-            } catch (MobileNumberException | SMSGatewayException e) {
-                tracer.trace(e.getMessage());
-                return showLoginError(e.getMessage());
-            }
-        }
-
-
-        if (smsTokenSent) {
-            log.info("Validating SMS Token");
-            String token = m_Request.getParameter("Response");
-
-            if (Token.validateToken(token, smsToken)) {
-                log.info("SMSToken Authentication Success");
-                return AUTHENTICATED;
+        if (validAuthentication()) {
+            if (smsTokenSent) {
+                return runTokenValidation();
             } else {
-                return showLoginError("Validating SMS Token failed");
+                return runInitialPhase();
             }
         }
 
         return NOT_AUTHENTICATED;
+    }
+
+    private int runTokenValidation() {
+        tracer.trace("Validating SMS Token");
+        String token = m_Request.getParameter("Response");
+
+        if (Token.validateToken(token, smsToken)) {
+            tracer.trace("SMS Token is valid");
+            tracer.trace("SMSTokenAuthenticationClass Authentication Success");
+            return AUTHENTICATED;
+        } else {
+            return showLoginError("Validating SMS Token failed");
+        }
+    }
+
+    private int runInitialPhase() {
+        tracer.trace("Sending SMS Token");
+
+        smsToken = Token.getToken(charsToken, lengthToken);
+        tracer.trace("Token: ", smsToken);
+
+        try {
+            log.info("Showing SMS Token input page");
+            String[] mobilePhoneAttribute = Mobile.validateMobileNumberAttribute(phoneAttribute);
+
+
+            String mobile = Mobile.getMobile(getPrincipalAttributes(mobilePhoneAttribute));
+            tracer.trace("Mobile:", mobile);
+
+            smsGateway.sendSMS(mobile, smsToken);
+
+            return showInitialTokenJSP();
+
+        } catch (MissingMobileNumberException e) {
+            tracer.trace(e.getMessage());
+            return showLoginError(String.format("%s. %s.", e.getMessage(), missingMobileMessage));
+        } catch (MobileNumberException | SMSGatewayException e) {
+            tracer.trace(e.getMessage());
+            return showLoginError(e.getMessage());
+        }
     }
 
     private boolean validAuthentication() {
@@ -135,7 +144,7 @@ public class SMSToken extends LocalAuthenticationClass {
             try {
                 NIDPError nIDPError = new NIDPError(getUserErrorMsg(), getUserErrorMsg(), Locale.US);
                 showError(nIDPError);
-            } catch(NullPointerException ignore) { // added to be able to run unit test
+            } catch (NullPointerException ignore) { // added to be able to run unit test
             }
 
             return false;

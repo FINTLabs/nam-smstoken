@@ -32,7 +32,7 @@ public class Mobile {
 
     public static String[] validateMobileNumberAttribute(String phoneAttribute) {
         if (phoneAttribute == null || phoneAttribute.length() == 0)
-            phoneAttribute = SMSTokenConstants.DEFALT_MOBILE_ATTRIBUTE;
+            phoneAttribute = SMSTokenConstants.DEFAULT_MOBILE_ATTRIBUTE;
 
         return new String[]{phoneAttribute};
     }

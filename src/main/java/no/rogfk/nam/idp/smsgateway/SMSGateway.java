@@ -40,19 +40,27 @@ public class SMSGateway {
             writer.flush();
             reader = new BufferedReader(new InputStreamReader(urlconn.getInputStream()));
             String line;
+            boolean containsSuccess = false;
+            boolean containsError = false;
             while ((line = reader.readLine()) != null) {
+
                 tracer.trace("SMS gateway output: ", line);
-                if (line.contains(config.getGatewayError())) {
-                    throw new SMSGatewayUnableToSendException("The SMS gateway could not send the SMS");
+                if (!containsError && line.contains(config.getGatewayError())) {
+                    containsError = true;
                 }
-                if (line.contains(config.getGatewaySuccess())) {
-                    tracer.trace("SMS successfylly sent");
-                } else {
-                    throw new SMSGatewayUnkownResponseException("The reponse from the gateway is uknown (" + line + ")");
+                if (!containsSuccess && line.contains(config.getGatewaySuccess())) {
+                    containsSuccess = true;
                 }
+
             }
-            writer.close();
-            reader.close();
+
+            if (containsError) {
+                throw new SMSGatewayUnableToSendException("The SMS gateway could not send the SMS");
+            } else if (containsSuccess) {
+                tracer.trace("SMS successfully sent");
+            } else {
+                throw new SMSGatewayUnkownResponseException("The reponse from the gateway is uknown");
+            }
         } catch (Exception e) {
             tracer.trace(e.getMessage());
             throw new SMSGatewaySystemException(e.getMessage());
