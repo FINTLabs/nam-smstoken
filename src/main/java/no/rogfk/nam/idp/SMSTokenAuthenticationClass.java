@@ -156,10 +156,20 @@ public class SMSTokenAuthenticationClass extends LocalAuthenticationClass {
     }
 
     private int showInitialTokenJSP() {
+
         smsTokenSent = true;
         m_Request.setAttribute(NIDPConstants.ATTR_URL, (getReturnURL() != null ? getReturnURL() : m_Request.getRequestURL().toString()));
-        showJSP("token");
+
+        showJSP(getTokenJSP());
+
         return SHOW_JSP;
+    }
+
+    private String getTokenJSP() {
+        String jsp = getProperty(AuthnConstants.PROPERTY_JSP);
+        if (jsp == null || jsp.length() == 0)
+            jsp = "token";
+        return jsp;
     }
 
     private NIDPPrincipal getUserPrincipal() {
@@ -199,7 +209,7 @@ public class SMSTokenAuthenticationClass extends LocalAuthenticationClass {
     private int showLoginError(String message) {
         m_Request.setAttribute(NIDPConstants.ATTR_URL, (getReturnURL() != null ? getReturnURL() : m_Request.getRequestURL().toString()));
         m_Request.setAttribute(NIDPConstants.ATTR_LOGIN_ERROR, message);
-        showJSP("token");
+        showJSP(getTokenJSP());
         tracer.trace(message);
         return SHOW_JSP;
 

@@ -13,7 +13,7 @@ in the NetIQ documentation for more information.
 
 ```shell
 # Replace the url with the latest url
-$ curl -O https://github.com/Rogaland/nam-smstoken/releases/download/v1.0.0/nam-smstoken-1.0.0.jar
+$ curl -O https://github.com/Rogaland/nam-smstoken/releases/download/v1.1.0/nam-smstoken-1.1.0.jar
 $ cp nam-smstoken-1.0.0.jar /opt/novell/nam/idp/webapps/nidp/WEB-INF/lib
 ```
 
@@ -25,7 +25,8 @@ $ cp nam-smstoken-1.0.0.jar /opt/novell/nam/idp/webapps/nidp/WEB-INF/lib
 | Java class      | `Other`                                        |
 | Java class path | `no.rogfk.nam.idp.SMSTokenAuthenticationClass` |
 
-* Create a `token.jsp file.` See the example in the `pages` directory of this project.
+* Create a `token.jsp file.` See the example in the `pages` directory of this project. You can use what ever filename on the 
+`JSP` file you want. Just specify the `JSP` property on `class` or `method`.
 
 
 ## Configuration parameters
