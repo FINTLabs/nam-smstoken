@@ -18,6 +18,7 @@ in the NetIQ documentation for more information.
 > ```
 
 * In the `Create Authentication Class` dialog use the following settings:
+
 | Name            | Value                                          |
 |-----------------|------------------------------------------------|
 | Display name    | A descriptive name                             |
