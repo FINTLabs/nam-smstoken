@@ -1,17 +1,33 @@
 # nam-smstoken
-SMS token authentication class for NetIQ Access Manager
+SMS token authentication class for NetIQ Access Manager. 
+
+This class is intended to be a addition to another authentication class. E.g. in conjunction with the 
+`Secure Name/Password - Form` class.
 
 
 # Install
 
 * Download the `jar` (`nam-smstoken-x.x.x.jar`) from [lastest](https://github.com/Rogaland/nam-smstoken/releases/latest) and copy it to 
-`/opt/novell/nam/idp/webapps/nidp/WEB-INF/lib`. See [Prerequisites](https://www.netiq.com/documentation/access-manager-43/nacm_enu/data/b8q8uws.html)
+`/opt/novell/nam/idp/webapps/nidp/WEB-INF/lib`. See [Deploying Your Authentication Class](https://www.netiq.com/documentation/access-manager-43/nacm_enu/data/bb8bwzi.html)
 in the NetIQ documentation for more information.
 
-* Create a `token.jsp file. See the example in the `pages` directory of this project.
+> ```shell
+> # Replace the url with the latest url
+> $ curl -O https://github.com/Rogaland/nam-smstoken/releases/download/v1.0.0/nam-smstoken-1.0.0.jar
+> $ cp nam-smstoken-1.0.0.jar /opt/novell/nam/idp/webapps/nidp/WEB-INF/lib
+> ```
+
+* In the `Create Authentication Class` dialog use the following settings:
+| Name            | Value                                          |
+|-----------------|------------------------------------------------|
+| Display name    | A descriptive name                             |
+| Java class      | `Other`                                        |
+| Java class path | `no.rogfk.nam.idp.SMSTokenAuthenticationClass` |
+
+* Create a `token.jsp file.` See the example in the `pages` directory of this project.
 
 
-## Configuration
+## Configuration parameters
 
 | Parameter                | Required | Default value                          | Description                                                                            | Example                                                                                                              |
 |--------------------------|----------|----------------------------------------|----------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|

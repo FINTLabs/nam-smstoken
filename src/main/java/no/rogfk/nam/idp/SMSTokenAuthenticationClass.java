@@ -41,24 +41,24 @@ public class SMSTokenAuthenticationClass extends LocalAuthenticationClass {
         super(properties, arrayList);
         smsTokenSent = false;
 
-        allowSessionUser = Boolean.valueOf(getProperty("allowSessionUser"));
-        phoneAttribute = getProperty("phoneAttribute");  // the attribute name to retrieve the number - default mobile
-        charsToken = getProperty("charsToken");  // characters allowed in token - default ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890
-        lengthToken = getProperty("lengthToken");  // length token - default 6
-        missingMobileMessage = getProperty("missingMobileMessage");
+        allowSessionUser = Boolean.valueOf(getProperty(SMSTokenConstants.PROP_NAME_ALLOW_SESSION_USER));
+        phoneAttribute = getProperty(SMSTokenConstants.PROP_NAME_MOBILE_PHONE_ATTRIBUTE);
+        charsToken = getProperty(SMSTokenConstants.PROP_NAME_TOKEN_CHARACTERS);
+        lengthToken = getProperty(SMSTokenConstants.PROP_NAME_TOKEN_LENGTH);
+        missingMobileMessage = getProperty(SMSTokenConstants.PROP_NAME_MISSING_MOBILE_MESSAGE);
 
-        tracer = new Tracer(Boolean.valueOf(getProperty("trace")));
+        tracer = new Tracer(Boolean.valueOf(getProperty(SMSTokenConstants.PROP_NAME_TRACE)));
 
         Config smsConfig = new Config();
-        smsConfig.setGatewayDestName(getProperty("gatewayDestName"));
-        smsConfig.setGatewayError(getProperty("gatewayError"));
-        smsConfig.setGatewaySuccess(getProperty("gatewaySuccess"));
-        smsConfig.setGatewayMessageName(getProperty("gatewayMessageName"));
-        smsConfig.setGatewayURL(getProperty("gatewayURL"));
-        smsConfig.setGatewayPasswordParameter(getProperty("gatewayPasswordParameter"));
-        smsConfig.setGatewayUserParameter(getProperty("gatewayUserParameter"));
-        smsConfig.setGatewayExtraParameter1(getProperty("gatewayExtraParameter1"));
-        smsConfig.setGatewayExtraParameter2(getProperty("gatewayExtraParameter2"));
+        smsConfig.setGatewayDestName(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_DESTINATION_NAME));
+        smsConfig.setGatewayError(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_ERROR));
+        smsConfig.setGatewaySuccess(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_SUCCESS));
+        smsConfig.setGatewayMessageName(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_MESSAGE_NAME));
+        smsConfig.setGatewayURL(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_URL));
+        smsConfig.setGatewayPasswordParameter(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_PASSWORD_PARAMETER));
+        smsConfig.setGatewayUserParameter(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_USER_PARAMETER));
+        smsConfig.setGatewayExtraParameter1(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_EXTRA_PARAMETER1));
+        smsConfig.setGatewayExtraParameter2(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_EXTRA_PARAMETER2));
 
         smsGateway = new SMSGateway(smsConfig, tracer);
 
