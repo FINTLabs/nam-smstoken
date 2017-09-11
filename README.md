@@ -51,7 +51,7 @@ $ cp nam-smstoken-1.0.0.jar /opt/novell/nam/idp/webapps/nidp/WEB-INF/lib
 
 The documentation from [NetIQ](https://www.netiq.com/documentation/access-manager-43/nacm_enu/data/b8q8uws.html) 
 states that you need `NAMCommon.jar` and `nidp.jar` to build the authentication class. This project has extensively
-testing so you will also need to copy these `jar`s from `/opt/novell/nam/idp/webapps/nidp/WEB-INF/lib` into the `netiq`
+testing so you will also need to copy these `jar`'s from `/opt/novell/nam/idp/webapps/nidp/WEB-INF/lib` into the `netiq`
 folder of the project to be able to build:
 ```
 jcc.jar
