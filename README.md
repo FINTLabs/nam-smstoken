@@ -13,8 +13,8 @@ in the NetIQ documentation for more information.
 
 ```shell
 # Replace the url with the latest url
-$ curl -O https://github.com/Rogaland/nam-smstoken/releases/download/v1.1.0/nam-smstoken-1.1.0.jar
-$ cp nam-smstoken-1.0.0.jar /opt/novell/nam/idp/webapps/nidp/WEB-INF/lib
+$ wget https://github.com/Rogaland/nam-smstoken/releases/download/v1.1.0/nam-smstoken-1.1.0.jar
+$ cp nam-smstoken-1.1.0.jar /opt/novell/nam/idp/webapps/nidp/WEB-INF/lib
 ```
 
 * In the `Create Authentication Class` dialog use the following settings:
