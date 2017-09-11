@@ -11,11 +11,11 @@ This class is intended to be a addition to another authentication class. E.g. in
 `/opt/novell/nam/idp/webapps/nidp/WEB-INF/lib`. See [Deploying Your Authentication Class](https://www.netiq.com/documentation/access-manager-43/nacm_enu/data/bb8bwzi.html)
 in the NetIQ documentation for more information.
 
-> ```shell
-> # Replace the url with the latest url
-> $ curl -O https://github.com/Rogaland/nam-smstoken/releases/download/v1.0.0/nam-smstoken-1.0.0.jar
-> $ cp nam-smstoken-1.0.0.jar /opt/novell/nam/idp/webapps/nidp/WEB-INF/lib
-> ```
+```shell
+# Replace the url with the latest url
+$ curl -O https://github.com/Rogaland/nam-smstoken/releases/download/v1.0.0/nam-smstoken-1.0.0.jar
+$ cp nam-smstoken-1.0.0.jar /opt/novell/nam/idp/webapps/nidp/WEB-INF/lib
+```
 
 * In the `Create Authentication Class` dialog use the following settings:
 
