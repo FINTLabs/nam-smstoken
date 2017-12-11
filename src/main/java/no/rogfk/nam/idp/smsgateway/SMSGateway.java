@@ -13,12 +13,10 @@ import java.net.URL;
 import java.net.URLConnection;
 
 public class SMSGateway {
-
     private Config config;
     private Tracer tracer;
 
     public SMSGateway(Config config, Tracer tracer) {
-
         this.config = config;
         config.validateConfiguration();
 
@@ -26,7 +24,6 @@ public class SMSGateway {
     }
 
     public void sendSMS(String phoneNumber, String token) {
-
         OutputStreamWriter writer = null;
         BufferedReader reader = null;
         try {
@@ -45,10 +42,10 @@ public class SMSGateway {
             while ((line = reader.readLine()) != null) {
 
                 tracer.trace("SMS gateway output: ", line);
-                if (!containsError && line.contains(config.getGatewayError())) {
+                if (!containsError && config.matchesGatewayError(line)) {
                     containsError = true;
                 }
-                if (!containsSuccess && line.contains(config.getGatewaySuccess())) {
+                if (!containsSuccess && config.matchesGatewaySuccess(line)) {
                     containsSuccess = true;
                 }
 
@@ -83,8 +80,8 @@ public class SMSGateway {
     }
 
     private String getData(String phoneNumber, String smsToken) {
-
-        StringBuilder data = new StringBuilder().append(config.getGatewayUserParameter())
+        StringBuilder data = new StringBuilder()
+                .append(config.getGatewayUserParameter())
                 .append("&").append(config.getGatewayPasswordParameter())
                 .append("&").append(config.getGatewayDestName())
                 .append("=").append(phoneNumber)
@@ -93,7 +90,6 @@ public class SMSGateway {
 
         if (config.hasExtraParameter1()) {
             data.append("&").append(config.getGatewayExtraParameter1());
-
         }
 
         if (config.hasExtraParameter2()) {

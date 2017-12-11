@@ -26,8 +26,8 @@ public class SMSTokenAuthenticationClass extends LocalAuthenticationClass {
 
     private boolean allowSessionUser;
 
-    protected boolean smsTokenSent;
-    protected String smsToken;
+    private boolean smsTokenSent;
+    private String smsToken;
 
     private String phoneAttribute;
     private String charsToken;
@@ -35,7 +35,6 @@ public class SMSTokenAuthenticationClass extends LocalAuthenticationClass {
     private String missingMobileMessage;
     private Tracer tracer;
     private SMSGateway smsGateway;
-
 
     public SMSTokenAuthenticationClass(Properties properties, ArrayList<UserAuthority> arrayList) {
         super(properties, arrayList);
@@ -52,7 +51,9 @@ public class SMSTokenAuthenticationClass extends LocalAuthenticationClass {
         Config smsConfig = new Config();
         smsConfig.setGatewayDestName(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_DESTINATION_NAME));
         smsConfig.setGatewayError(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_ERROR));
+        smsConfig.setGatewayErrorRegex(Boolean.valueOf(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_ERROR_REGEX)));
         smsConfig.setGatewaySuccess(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_SUCCESS));
+        smsConfig.setGatewaySuccessRegex(Boolean.valueOf(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_SUCCESS_REGEX)));
         smsConfig.setGatewayMessageName(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_MESSAGE_NAME));
         smsConfig.setGatewayURL(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_URL));
         smsConfig.setGatewayPasswordParameter(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_PASSWORD_PARAMETER));

@@ -4,7 +4,6 @@ import no.rogfk.nam.idp.smsgateway.exceptions.SMSGatewayConfigurationException
 import spock.lang.Specification
 
 class ConfigSpec extends Specification {
-
     private Config config
 
     void setup() {
@@ -62,7 +61,7 @@ class ConfigSpec extends Specification {
 
     }
 
-    def "Has exstra parameter"() {
+    def "Has extra parameter"() {
         given:
         def config = new Config()
         config.setGatewayExtraParameter1("p")
@@ -77,13 +76,12 @@ class ConfigSpec extends Specification {
         hasParam2
     }
 
-    def "Has not exstra parameter"() {
+    def "Has not extra parameter"() {
         when:
         def config = new Config()
 
         then:
         !config.hasExtraParameter1()
         !config.hasExtraParameter2()
-
     }
 }

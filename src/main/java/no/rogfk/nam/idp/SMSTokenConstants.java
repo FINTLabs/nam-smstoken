@@ -14,7 +14,9 @@ public class SMSTokenConstants {
     public final static String PROP_NAME_GATEWAY_DESTINATION_NAME = "gatewayDestName";
     public final static String PROP_NAME_GATEWAY_MESSAGE_NAME = "gatewayMessageName";
     public final static String PROP_NAME_GATEWAY_SUCCESS = "gatewaySuccess";
+    public final static String PROP_NAME_GATEWAY_SUCCESS_REGEX = "gatewaySuccessRegex";
     public final static String PROP_NAME_GATEWAY_ERROR = "gatewayError";
+    public final static String PROP_NAME_GATEWAY_ERROR_REGEX = "gatewayErrorRegex";
     public final static String PROP_NAME_MOBILE_PHONE_ATTRIBUTE = "phoneAttribute";
     public final static String PROP_NAME_TOKEN_CHARACTERS = "charsToken";
     public final static String PROP_NAME_TOKEN_LENGTH = "lengthToken";
