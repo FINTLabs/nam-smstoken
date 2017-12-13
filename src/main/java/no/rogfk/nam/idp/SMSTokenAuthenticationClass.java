@@ -26,8 +26,8 @@ public class SMSTokenAuthenticationClass extends LocalAuthenticationClass {
 
     private boolean allowSessionUser;
 
-    private boolean smsTokenSent;
-    private String smsToken;
+    protected boolean smsTokenSent;
+    protected String smsToken;
 
     private String phoneAttribute;
     private String charsToken;
