@@ -46,24 +46,28 @@ public class SMSTokenAuthenticationClass extends LocalAuthenticationClass {
         lengthToken = getProperty(SMSTokenConstants.PROP_NAME_TOKEN_LENGTH);
         missingMobileMessage = getProperty(SMSTokenConstants.PROP_NAME_MISSING_MOBILE_MESSAGE);
 
-        tracer = new Tracer(Boolean.valueOf(getProperty(SMSTokenConstants.PROP_NAME_TRACE)));
+        tracer = new Tracer(getProperty(SMSTokenConstants.PROP_NAME_TRACE));
 
+        Config smsConfig = createConfig();
+        smsGateway = new SMSGateway(smsConfig, tracer);
+
+        tracer.trace("Greetings from Rogaland fylkeskommune, IKT- og arkivavdelingen!");
+    }
+
+    private Config createConfig() {
         Config smsConfig = new Config();
         smsConfig.setGatewayDestName(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_DESTINATION_NAME));
         smsConfig.setGatewayError(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_ERROR));
-        smsConfig.setGatewayErrorRegex(Boolean.valueOf(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_ERROR_REGEX)));
+        smsConfig.setGatewayErrorRegex(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_ERROR_REGEX));
         smsConfig.setGatewaySuccess(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_SUCCESS));
-        smsConfig.setGatewaySuccessRegex(Boolean.valueOf(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_SUCCESS_REGEX)));
+        smsConfig.setGatewaySuccessRegex(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_SUCCESS_REGEX));
         smsConfig.setGatewayMessageName(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_MESSAGE_NAME));
         smsConfig.setGatewayURL(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_URL));
         smsConfig.setGatewayPasswordParameter(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_PASSWORD_PARAMETER));
         smsConfig.setGatewayUserParameter(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_USER_PARAMETER));
         smsConfig.setGatewayExtraParameter1(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_EXTRA_PARAMETER1));
         smsConfig.setGatewayExtraParameter2(getProperty(SMSTokenConstants.PROP_NAME_GATEWAY_EXTRA_PARAMETER2));
-
-        smsGateway = new SMSGateway(smsConfig, tracer);
-
-        tracer.trace("Greetings from Rogaland fylkeskommune, IKT- og arkivavdelingen!");
+        return smsConfig;
     }
 
     SMSTokenAuthenticationClass(Properties properties, SMSGateway smsGateway) {

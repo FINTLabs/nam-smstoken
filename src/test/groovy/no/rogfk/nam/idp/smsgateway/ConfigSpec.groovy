@@ -84,4 +84,71 @@ class ConfigSpec extends Specification {
         !config.hasExtraParameter1()
         !config.hasExtraParameter2()
     }
+
+    def "Matches gateway success, string contains"() {
+        given:
+        def config = new Config()
+        config.setGatewaySuccessRegex('false')
+        config.setGatewaySuccess('test')
+
+        when:
+        def matches = config.matchesGatewaySuccess('test 123')
+
+        then:
+        matches
+    }
+
+    def "Matches gateway success, regular expression"() {
+        given:
+        def config = new Config()
+        config.setGatewaySuccessRegex('true')
+        config.setGatewaySuccess('.+')
+
+        when:
+        def matches = config.matchesGatewaySuccess('test')
+
+        then:
+        matches
+    }
+
+    def "Matches gateway error, string contains"() {
+        given:
+        def config = new Config()
+        config.setGatewayErrorRegex('false')
+        config.setGatewayError('test')
+
+        when:
+        def matches = config.matchesGatewayError('test 123')
+
+        then:
+        matches
+    }
+
+    def "Matches gateway error, regular expression"() {
+        given:
+        def config = new Config()
+        config.setGatewayErrorRegex('true')
+        config.setGatewayError('.+')
+
+        when:
+        def matches = config.matchesGatewayError('test')
+
+        then:
+        matches
+    }
+
+    def "Null value in regex sets value to false"() {
+        given:
+        def config = new Config()
+
+        when:
+        config.setGatewaySuccessRegex(null)
+        config.setGatewayErrorRegex(null)
+        def gatewaySuccessRegex = config.isGatewaySuccessRegex()
+        def gatewayErrorRegex = config.isGatewayErrorRegex()
+
+        then:
+        !gatewaySuccessRegex
+        !gatewayErrorRegex
+    }
 }

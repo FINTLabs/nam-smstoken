@@ -47,6 +47,14 @@ public class Config {
         }
     }
 
+    public void setGatewaySuccessRegex(String gatewaySuccessRegex) {
+        this.gatewaySuccessRegex = Boolean.valueOf(gatewaySuccessRegex);
+    }
+
+    public void setGatewayErrorRegex(String gatewayErrorRegex) {
+        this.gatewayErrorRegex = Boolean.valueOf(gatewayErrorRegex);
+    }
+
     boolean hasExtraParameter1() {
         return (gatewayExtraParameter1 != null && !gatewayExtraParameter1.isEmpty());
     }
