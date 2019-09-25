@@ -15,3 +15,4 @@ out/
 netiq/*
 !netiq/.gitkeep
 netiq1
+.DS_Store
